@@ -10,7 +10,7 @@ from model.SwinUNETR import SwinUNETR
 from model.Unet import UNet3D
 from model.DiNTS import TopologyInstance, DiNTS
 from model.Unetpp import BasicUNetPlusPlus
-
+from utils.utils import DEVICE
 
 
 
@@ -143,7 +143,7 @@ class Universal_model(nn.Module):
         task_encoding = torch.zeros(size=(N, 7))
         for i in range(N):
             task_encoding[i, task_id[i]]=1
-        return task_encoding.cuda()
+        return task_encoding.to(DEVICE)
 
     def parse_dynamic_params(self, params, channels, weight_nums, bias_nums):
         assert params.dim() == 2
