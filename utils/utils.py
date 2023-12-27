@@ -176,6 +176,7 @@ TUMOR_ORGAN = {
     'Kidney Cyst': [2,3]
 }
 
+DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def organ_post_process(pred_mask, organ_list, save_dir, args):
     post_pred_mask = np.zeros(pred_mask.shape)

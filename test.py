@@ -18,7 +18,7 @@ from model.Universal_model import Universal_model
 from dataset.dataloader import get_loader
 from utils import loss
 from utils.utils import dice_score, threshold_organ, visualize_label, merge_label, get_key
-from utils.utils import TEMPLATE, ORGAN_NAME, NUM_CLASS
+from utils.utils import TEMPLATE, ORGAN_NAME, NUM_CLASS, DEVICE
 from utils.utils import organ_post_process, threshold_organ
 
 torch.multiprocessing.set_sharing_strategy('file_system')
@@ -27,15 +27,15 @@ torch.multiprocessing.set_sharing_strategy('file_system')
 def validation(model, ValLoader, val_transforms, args):
     save_dir = 'out/' + args.log_name + f'/test_healthp_{args.epoch}'
     if not os.path.isdir(save_dir):
-        os.mkdir(save_dir)
-        os.mkdir(save_dir+'/predict')
+        os.makedirs(save_dir)
+        os.makedirs(save_dir+'/predict')
     model.eval()
     dice_list = {}
     for key in TEMPLATE.keys():
         dice_list[key] = np.zeros((2, NUM_CLASS)) # 1st row for dice, 2nd row for count
     for index, batch in enumerate(tqdm(ValLoader)):
         # print('%d processd' % (index))
-        image, label, name = batch["image"].cuda(), batch["post_label"], batch["name"]
+        image, label, name = batch["image"].to(DEVICE), batch["post_label"], batch["name"]
         print(image.shape)
         # print(label.shape)
         with torch.no_grad():
@@ -46,7 +46,8 @@ def validation(model, ValLoader, val_transforms, args):
         #pred_hard = threshold_organ(pred_sigmoid, organ=args.threshold_organ, threshold=args.threshold)
         pred_hard = threshold_organ(pred_sigmoid)
         pred_hard = pred_hard.cpu()
-        torch.cuda.empty_cache()
+        if DEVICE.type == 'cuda':
+            torch.cuda.empty_cache()
 
         B = pred_hard.shape[0]
         for b in range(B):
@@ -57,8 +58,8 @@ def validation(model, ValLoader, val_transforms, args):
             pred_hard_post = torch.tensor(pred_hard_post)
 
             for organ in organ_list:
-                if torch.sum(label[b,organ-1,:,:,:].cuda()) != 0:
-                    dice_organ, recall, precision = dice_score(pred_hard_post[b,organ-1,:,:,:].cuda(), label[b,organ-1,:,:,:].cuda())
+                if torch.sum(label[b,organ-1,:,:,:].to(DEVICE)) != 0:
+                    dice_organ, recall, precision = dice_score(pred_hard_post[b,organ-1,:,:,:].to(DEVICE), label[b,organ-1,:,:,:].to(DEVICE))
                     dice_list[template_key][0][organ-1] += dice_organ.item()
                     dice_list[template_key][1][organ-1] += 1
                     content += '%s: %.4f, '%(ORGAN_NAME[organ-1], dice_organ.item())
@@ -83,8 +84,9 @@ def validation(model, ValLoader, val_transforms, args):
             ## load data
             # data = np.load('/out/epoch_80/predict/****.npz')
             # pred, label = data['pred'], data['label']
-            
-        torch.cuda.empty_cache()
+        
+        if DEVICE.type == 'cuda':
+            torch.cuda.empty_cache()
     
     ave_organ_dice = np.zeros((2, NUM_CLASS))
 
@@ -197,9 +199,9 @@ def main():
     model.load_state_dict(store_dict)
     print('Use pretrained weights')
 
-    model.cuda()
+    model.to(DEVICE)
 
-    torch.backends.cudnn.benchmark = True
+    torch.backends.cudnn.benchmark = True if DEVICE.type == 'cuda' else False
 
     test_loader, val_transforms = get_loader(args)
 
