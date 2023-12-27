@@ -1,0 +1,10 @@
+10_Decathlon/Task09_Spleen/imagesTr/spleen_13.nii.gz	10_Decathlon/Task09_Spleen/labelsTr/spleen_13.nii.gz
+10_Decathlon/Task09_Spleen/imagesTr/spleen_14.nii.gz	10_Decathlon/Task09_Spleen/labelsTr/spleen_14.nii.gz
+10_Decathlon/Task09_Spleen/imagesTr/spleen_17.nii.gz	10_Decathlon/Task09_Spleen/labelsTr/spleen_17.nii.gz
+10_Decathlon/Task09_Spleen/imagesTr/spleen_2.nii.gz 10_Decathlon/Task09_Spleen/labelsTr/spleen_2.nii.gz
+10_Decathlon/Task09_Spleen/imagesTr/spleen_21.nii.gz    10_Decathlon/Task09_Spleen/labelsTr/spleen_21.nii.gz
+10_Decathlon/Task09_Spleen/imagesTr/spleen_28.nii.gz	10_Decathlon/Task09_Spleen/labelsTr/spleen_28.nii.gz
+10_Decathlon/Task09_Spleen/imagesTr/spleen_41.nii.gz	10_Decathlon/Task09_Spleen/labelsTr/spleen_41.nii.gz
+10_Decathlon/Task09_Spleen/imagesTr/spleen_46.nii.gz	10_Decathlon/Task09_Spleen/labelsTr/spleen_46.nii.gz
+10_Decathlon/Task09_Spleen/imagesTr/spleen_56.nii.gz	10_Decathlon/Task09_Spleen/labelsTr/spleen_56.nii.gz
+10_Decathlon/Task09_Spleen/imagesTr/spleen_6.nii.gz	10_Decathlon/Task09_Spleen/labelsTr/spleen_6.nii.gz

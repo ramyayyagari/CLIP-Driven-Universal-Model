@@ -142,12 +142,12 @@ def main():
     parser.add_argument('--weight_decay', default=1e-5, type=float, help='Weight Decay')
 
     ## dataset
-    parser.add_argument('--dataset_list', nargs='+', default=['PAOT_123457891213']) # 'PAOT', 'felix'
+    parser.add_argument('--dataset_list', nargs='+', default=['benchmark']) # 'PAOT', 'felix'
     ### please check this argment carefully
     ### PAOT: include PAOT_123457891213 and PAOT_10
     ### PAOT_123457891213: include 1 2 3 4 5 7 8 9 12 13
     ### PAOT_10_inner
-    parser.add_argument('--data_root_path', default='/computenodes/node31/team1/jliu/data/ct_data/', help='data root path')
+    parser.add_argument('--data_root_path', default='/Users/ramya/CLIP-Driven-Universal-Model/', help='data root path')
     parser.add_argument('--data_txt_path', default='./dataset/dataset_list/', help='data txt path')
     parser.add_argument('--batch_size', default=1, type=int, help='batch size')
     parser.add_argument('--num_workers', default=8, type=int, help='workers numebr for DataLoader')
@@ -165,7 +165,7 @@ def main():
 
     parser.add_argument('--phase', default='test', help='train or validation or test')
     parser.add_argument('--cache_dataset', action="store_true", default=False, help='whether use cache dataset')
-    parser.add_argument('--store_result', action="store_true", default=False, help='whether save prediction result')
+    parser.add_argument('--store_result', action="store_true", default=True, help='whether save prediction result')
     parser.add_argument('--cache_rate', default=0.6, type=float, help='The percentage of cached data in total')
 
     parser.add_argument('--threshold_organ', default='Pancreas Tumor')
@@ -183,7 +183,7 @@ def main():
     
     #Load pre-trained weights
     store_dict = model.state_dict()
-    checkpoint = torch.load(args.resume)
+    checkpoint = torch.load(args.resume, map_location=DEVICE)
     load_dict = checkpoint['net']
     # args.epoch = checkpoint['epoch']
 
