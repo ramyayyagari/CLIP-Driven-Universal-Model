@@ -1,3 +1,18 @@
+# Updates on this Fork
+- This fork leverages the pre-trained Universal Model. Download the Swin UNETR parameter weights [here](https://www.dropbox.com/s/jdsodw2vemsy8sz/swinunetr.pth) and place these in the `pretrained_weights` folder.
+
+## Setup
+Create a new environment via `conda create -n "env_name" python=3.8`. Then, run the following commands:
+```
+git clone https://github.com/ramyayyagari/CLIP-Driven-Universal-Model.git
+pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0 --extra-index-url https://download.pytorch.org/whl/cu113
+pip install 'monai[all]'
+pip install -r requirements.txt
+pip install pandas
+pip install numpy
+pip install
+```
+
 # News
  - 🔥 We collect recent medical universal models in [AWESOME MEDICAL UNIVERSAL MODEL](documents/awesome.md) [![Awesome](https://awesome.re/badge.svg)](https://awesome.re).
  - 😎 We have document for [common questions for code](documents/common_code_questions.md) and [common questions for paper](documents/common_paper_questions.md).
