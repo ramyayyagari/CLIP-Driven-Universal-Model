@@ -616,7 +616,7 @@ def threshold_organ(data, organ=None, threshold=None):
         THRESHOLD_DIC[organ] = threshold
     for key, value in THRESHOLD_DIC.items():
         threshold_list.append(value)
-    threshold_list = torch.tensor(threshold_list).repeat(B, 1).reshape(B,len(threshold_list),1,1,1).cuda()
+    threshold_list = torch.tensor(threshold_list).repeat(B, 1).reshape(B,len(threshold_list),1,1,1).to(DEVICE)
     pred_hard = data > threshold_list
     return pred_hard
 
@@ -667,8 +667,8 @@ def visualize_label(batch, save_dir, input_transform):
 
 def merge_label(pred_bmask, name):
     B, C, W, H, D = pred_bmask.shape
-    merged_label_v1 = torch.zeros(B,1,W,H,D).cuda()
-    merged_label_v2 = torch.zeros(B,1,W,H,D).cuda()
+    merged_label_v1 = torch.zeros(B,1,W,H,D).to(DEVICE)
+    merged_label_v2 = torch.zeros(B,1,W,H,D).to(DEVICE)
     for b in range(B):
         template_key = get_key(name[b])
         transfer_mapping_v1 = MERGE_MAPPING_v1[template_key]
