@@ -6,11 +6,12 @@ Create a new environment via `conda create -n "env_name" python=3.8`. Then, run 
 ```
 git clone https://github.com/ramyayyagari/CLIP-Driven-Universal-Model.git
 pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0 --extra-index-url https://download.pytorch.org/whl/cu113
-pip install 'monai[all]'
 pip install -r requirements.txt
+pip install 'monai[all]'
 pip install pandas
+pip install matplotlib
 pip install numpy
-pip install
+pip install scikit-learn
 ```
 
 # News
