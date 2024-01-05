@@ -303,90 +303,108 @@ def get_loader(args):
         ]
     )
 
-    ## training dict part
-    # train_img = []
-    # train_lbl = []
-    # train_post_lbl = []
-    # train_name = []
+    if args.phase == 'train':
+        train_img = []
+        train_lbl = []
+        train_post_lbl = []
+        train_name = []
 
-    # for item in args.dataset_list:
-    #     for line in open(args.data_txt_path + item +'_train.txt'):
-    #         name = line.strip().split()[1].split('.')[0]
-    #         train_img.append(args.data_root_path + line.strip().split()[0])
-    #         train_lbl.append(args.data_root_path + line.strip().split()[1])
-    #         train_post_lbl.append(args.data_root_path + name.replace('label', 'post_label') + '.h5')
-    #         train_name.append(name)
-    # data_dicts_train = [{'image': image, 'label': label, 'post_label': post_label, 'name': name}
-    #             for image, label, post_label, name in zip(train_img, train_lbl, train_post_lbl, train_name)]
-    # print('train len {}'.format(len(data_dicts_train)))
+        for item in args.dataset_list:
+            for line in open(args.data_txt_path + item +'_train.txt'):
+                name = line.strip().split()[1].split('.')[0]
+                train_img.append(args.data_root_path + line.strip().split()[0])
+                train_lbl.append(args.data_root_path + line.strip().split()[1])
+                train_post_lbl.append(args.data_root_path + name.replace('label', 'post_label') + '.h5')
+                train_name.append(name)
+        data_dicts_train = [{'image': image, 'label': label, 'post_label': post_label, 'name': name}
+                    for image, label, post_label, name in zip(train_img, train_lbl, train_post_lbl, train_name)]
+        print('train len {}'.format(len(data_dicts_train)))
 
-
-    ## validation dict part
-    # val_img = []
-    # val_lbl = []
-    # val_post_lbl = []
-    # val_name = []
-    # for item in args.dataset_list:
-    #     for line in open(args.data_txt_path + item +'_val.txt'):
-    #         name = line.strip().split()[1].split('.')[0]
-    #         val_img.append(args.data_root_path + line.strip().split()[0])
-    #         val_lbl.append(args.data_root_path + line.strip().split()[1])
-    #         val_post_lbl.append(args.data_root_path + name.replace('label', 'post_label') + '.h5')
-    #         val_name.append(name)
-    # data_dicts_val = [{'image': image, 'label': label, 'post_label': post_label, 'name': name}
-    #             for image, label, post_label, name in zip(val_img, val_lbl, val_post_lbl, val_name)]
-    # print('val len {}'.format(len(data_dicts_val)))
-
-
-    ## test dict part
-    test_img = []
-    test_lbl = []
-    test_post_lbl = []
-    test_name = []
-    for item in args.dataset_list:
-        for line in open(args.data_txt_path + item +'_test.txt'):
-            name = line.strip().split()[1].split('.')[0]
-            test_img.append(args.data_root_path + line.strip().split()[0])
-            test_lbl.append(args.data_root_path + line.strip().split()[1])
-            test_post_lbl.append(args.data_root_path + name.replace('label', 'post_label') + '.h5')
-            test_name.append(name)
-    data_dicts_test = [{'image': image, 'label': label, 'post_label': post_label, 'name': name}
-                for image, label, post_label, name in zip(test_img, test_lbl, test_post_lbl, test_name)]
-    print('test len {}'.format(len(data_dicts_test)))
-
-    # if args.phase == 'train':
-    #     if args.cache_dataset:
-    #         if args.uniform_sample:
-    #             train_dataset = UniformCacheDataset(data=data_dicts_train, transform=train_transforms, cache_rate=args.cache_rate, datasetkey=args.datasetkey)
-    #         else:
-    #             train_dataset = CacheDataset(data=data_dicts_train, transform=train_transforms, cache_rate=args.cache_rate)
-    #     else:
-    #         if args.uniform_sample:
-    #             train_dataset = UniformDataset(data=data_dicts_train, transform=train_transforms, datasetkey=args.datasetkey)
-    #         else:
-    #             train_dataset = Dataset(data=data_dicts_train, transform=train_transforms)
-    #     train_sampler = DistributedSampler(dataset=train_dataset, even_divisible=True, shuffle=True) if args.dist else None
-    #     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None), num_workers=args.num_workers, 
-    #                                 collate_fn=list_data_collate, sampler=train_sampler)
-    #     return train_loader, train_sampler
+        if args.cache_dataset:
+            if args.uniform_sample:
+                train_dataset = UniformCacheDataset(data=data_dicts_train, transform=train_transforms, cache_rate=args.cache_rate, datasetkey=args.datasetkey)
+            else:
+                train_dataset = CacheDataset(data=data_dicts_train, transform=train_transforms, cache_rate=args.cache_rate)
+        else:
+            if args.uniform_sample:
+                train_dataset = UniformDataset(data=data_dicts_train, transform=train_transforms, datasetkey=args.datasetkey)
+            else:
+                train_dataset = Dataset(data=data_dicts_train, transform=train_transforms)
+        train_sampler = DistributedSampler(dataset=train_dataset, even_divisible=True, shuffle=True) if args.dist else None
+        train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None), num_workers=args.num_workers, 
+                                    collate_fn=list_data_collate, sampler=train_sampler)
+        return train_loader, train_sampler
     
     
-    # if args.phase == 'validation':
-    #     if args.cache_dataset:
-    #         val_dataset = CacheDataset(data=data_dicts_val, transform=val_transforms, cache_rate=args.cache_rate)
-    #     else:
-    #         val_dataset = Dataset(data=data_dicts_val, transform=val_transforms)
-    #     val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False, num_workers=4, collate_fn=list_data_collate)
-    #     return val_loader, val_transforms
+    if args.phase == 'validation':
+        val_img = []
+        val_lbl = []
+        val_post_lbl = []
+        val_name = []
+        for item in args.dataset_list:
+            for line in open(args.data_txt_path + item +'_val.txt'):
+                name = line.strip().split()[1].split('.')[0]
+                val_img.append(args.data_root_path + line.strip().split()[0])
+                val_lbl.append(args.data_root_path + line.strip().split()[1])
+                val_post_lbl.append(args.data_root_path + name.replace('label', 'post_label') + '.h5')
+                val_name.append(name)
+        data_dicts_val = [{'image': image, 'label': label, 'post_label': post_label, 'name': name}
+                    for image, label, post_label, name in zip(val_img, val_lbl, val_post_lbl, val_name)]
+        print('val len {}'.format(len(data_dicts_val)))
+
+        if args.cache_dataset:
+            val_dataset = CacheDataset(data=data_dicts_val, transform=val_transforms, cache_rate=args.cache_rate)
+        else:
+            val_dataset = Dataset(data=data_dicts_val, transform=val_transforms)
+        val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False, num_workers=4, collate_fn=list_data_collate)
+        return val_loader, val_transforms
     
     
     if args.phase == 'test':
+        test_img = []
+        test_lbl = []
+        test_post_lbl = []
+        test_name = []
+        for item in args.dataset_list:
+            for line in open(args.data_txt_path + item +'_test.txt'):
+                name = line.strip().split()[1].split('.')[0]
+                test_img.append(args.data_root_path + line.strip().split()[0])
+                test_lbl.append(args.data_root_path + line.strip().split()[1])
+                test_post_lbl.append(args.data_root_path + name.replace('label', 'post_label') + '.h5')
+                test_name.append(name)
+        data_dicts_test = [{'image': image, 'label': label, 'post_label': post_label, 'name': name}
+                    for image, label, post_label, name in zip(test_img, test_lbl, test_post_lbl, test_name)]
+        print('test len {}'.format(len(data_dicts_test)))
+
         if args.cache_dataset:
             test_dataset = CacheDataset(data=data_dicts_test, transform=val_transforms, cache_rate=args.cache_rate)
         else:
             test_dataset = Dataset(data=data_dicts_test, transform=val_transforms)
         test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=4, collate_fn=list_data_collate)
         return test_loader, val_transforms
+    
+    if args.phase == 'predict': # based off of 'test' section above
+        pred_img = []
+        pred_lbl = []
+        pred_post_lbl = []
+        pred_name = []
+
+        line = args.data_txt_path
+        name = line.strip().split()[1].split('.')[0]
+        pred_img.append(args.data_root_path + line.strip().split()[0])
+        pred_lbl.append(args.data_root_path + line.strip().split()[1])
+        pred_post_lbl.append(args.data_root_path + name.replace('label', 'post_label') + '.h5')
+        pred_name.append(name)
+        data_dicts_pred = [{'image': image, 'label': label, 'post_label': post_label, 'name': name}
+                    for image, label, post_label, name in zip(pred_img, pred_lbl, pred_post_lbl, pred_name)]
+        print('pred len {}'.format(len(data_dicts_pred)))
+
+        if args.cache_dataset:
+            pred_dataset = CacheDataset(data=data_dicts_pred, transform=val_transforms, cache_rate=args.cache_rate)
+        else:
+            pred_dataset = Dataset(data=data_dicts_pred, transform=val_transforms)
+        pred_loader = DataLoader(pred_dataset, batch_size=1, shuffle=False, num_workers=4, collate_fn=list_data_collate)
+        return pred_loader, val_transforms
 
 
 def get_loader_without_gt(args):
