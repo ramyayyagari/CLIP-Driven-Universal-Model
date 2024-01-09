@@ -434,13 +434,10 @@ def get_loader_without_gt(args):
     )
 
     ## test dict part
-    test_img = []
-    test_name = []
-    for item in args.dataset_list:
-        for line in open(args.data_txt_path + item +'_test.txt'):
-            name = line.strip().split()[1].split('.')[0]
-            test_img.append(args.data_root_path + line.strip().split()[0])
-            test_name.append(name)
+
+    line = args.data_txt_path
+    test_name = [line.strip().split('/')[-1].split('.')[0]]
+    test_img = [args.data_root_path.strip() + line.strip()]
     data_dicts_test = [{'image': image, 'name': name}
                 for image, name in zip(test_img, test_name)]
     print('test len {}'.format(len(data_dicts_test)))
