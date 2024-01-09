@@ -18,7 +18,7 @@ from model.Universal_model import Universal_model
 from dataset.dataloader import get_loader_without_gt
 from utils import loss
 from utils.utils import dice_score, threshold_organ, visualize_label, merge_label, get_key
-from utils.utils import TEMPLATE, ORGAN_NAME, NUM_CLASS
+from utils.utils import TEMPLATE, ORGAN_NAME, NUM_CLASS, DEVICE
 from utils.utils import organ_post_process, threshold_organ
 
 torch.multiprocessing.set_sharing_strategy('file_system')
@@ -35,7 +35,7 @@ def validation(model, ValLoader, val_transforms, args):
         dice_list[key] = np.zeros((2, NUM_CLASS)) # 1st row for dice, 2nd row for count
     for index, batch in enumerate(tqdm(ValLoader)):
         # print('%d processd' % (index))
-        image, name = batch["image"].cuda(), batch["name"]
+        image, name = batch["image"].to(DEVICE), batch["name"]
         print(image.shape)
         # print(label.shape)
         with torch.no_grad():
@@ -46,7 +46,8 @@ def validation(model, ValLoader, val_transforms, args):
         #pred_hard = threshold_organ(pred_sigmoid, organ=args.threshold_organ, threshold=args.threshold)
         pred_hard = threshold_organ(pred_sigmoid)
         pred_hard = pred_hard.cpu()
-        torch.cuda.empty_cache()
+        if DEVICE.type == 'cuda':
+            torch.cuda.empty_cache()
 
         B = pred_hard.shape[0]
         for b in range(B):
@@ -71,8 +72,9 @@ def validation(model, ValLoader, val_transforms, args):
             batch['one_channel_label_v1'] = one_channel_label_v1.cpu()
             batch['one_channel_label_v2'] = one_channel_label_v2.cpu()
             visualize_label(batch, save_dir + '/output/' + name[0].split('/')[0] , val_transforms)
-            
-        torch.cuda.empty_cache()
+        
+        if DEVICE.type == 'cuda':    
+            torch.cuda.empty_cache()
     
     ave_organ_dice = np.zeros((2, NUM_CLASS))
 
@@ -185,7 +187,7 @@ def main():
     model.load_state_dict(store_dict)
     print('Use pretrained weights')
 
-    model.cuda()
+    model.to(DEVICE)
 
     torch.backends.cudnn.benchmark = True
 
