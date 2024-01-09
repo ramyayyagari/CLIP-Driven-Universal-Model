@@ -21,6 +21,8 @@ from utils.utils import dice_score, threshold_organ, visualize_label, merge_labe
 from utils.utils import TEMPLATE, ORGAN_NAME, NUM_CLASS, DEVICE
 from utils.utils import organ_post_process, threshold_organ
 
+import nibabel as nib
+
 torch.multiprocessing.set_sharing_strategy('file_system')
 
 
@@ -36,6 +38,7 @@ def validation(model, ValLoader, val_transforms, args):
     for index, batch in enumerate(tqdm(ValLoader)):
         # print('%d processd' % (index))
         image, name = batch["image"].to(DEVICE), batch["name"]
+        affine_matrix = nib.load(image).affine
         print(image.shape)
         # print(label.shape)
         with torch.no_grad():
@@ -48,9 +51,13 @@ def validation(model, ValLoader, val_transforms, args):
         pred_hard = pred_hard.cpu()
         if DEVICE.type == 'cuda':
             torch.cuda.empty_cache()
+        
+        np_pred = pred_hard.numpy()
+        nifti_img = nib.Nifti1Image(np_pred, affine_matrix) 
+        nib.save(nifti_img, 'pred_output.nii.gz')
 
-        B = pred_hard.shape[0]
-        # Commented out for now
+        ### Commented out for now
+        # B = pred_hard.shape[0]
         # for b in range(0):
         #     # content = 'case%s| '%(name[b])
         #     # template_key = get_key(name[b])
