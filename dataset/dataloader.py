@@ -437,7 +437,7 @@ def get_loader_without_gt(args):
 
     line = args.data_txt_path
     test_name = [line.strip().split('/')[-1].split('.')[0]]
-    test_img = [args.data_root_path.strip() + line.strip()]
+    test_img = [line.strip()]
     data_dicts_test = [{'image': image, 'name': name}
                 for image, name in zip(test_img, test_name)]
     print('test len {}'.format(len(data_dicts_test)))

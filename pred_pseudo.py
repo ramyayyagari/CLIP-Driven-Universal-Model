@@ -50,29 +50,30 @@ def validation(model, ValLoader, val_transforms, args):
             torch.cuda.empty_cache()
 
         B = pred_hard.shape[0]
-        for b in range(B):
-            # content = 'case%s| '%(name[b])
-            # template_key = get_key(name[b])
-            # organ_list = TEMPLATE[template_key]
-            organ_list = [1] # hardcoded for spleen
-            pred_hard_post = organ_post_process(pred_hard.numpy(), organ_list, args.log_name+'/'+name[0].split('/')[0]+'/'+name[0].split('/')[-1],args)
-            pred_hard_post = torch.tensor(pred_hard_post)
+        # Commented out for now
+        # for b in range(0):
+        #     # content = 'case%s| '%(name[b])
+        #     # template_key = get_key(name[b])
+        #     # organ_list = TEMPLATE[template_key]
+        #     organ_list = [1] # hardcoded for spleen
+        #     pred_hard_post = organ_post_process(pred_hard.numpy(), organ_list, args.log_name+'/'+name[0].split('/')[0]+'/'+name[0].split('/')[-1],args)
+        #     pred_hard_post = torch.tensor(pred_hard_post)
 
-            # for organ in organ_list:
-            #     if torch.sum(label[b,organ-1,:,:,:].cuda()) != 0:
-            #         dice_organ, recall, precision = dice_score(pred_hard_post[b,organ-1,:,:,:].cuda(), label[b,organ-1,:,:,:].cuda())
-            #         dice_list[template_key][0][organ-1] += dice_organ.item()
-            #         dice_list[template_key][1][organ-1] += 1
-            #         content += '%s: %.4f, '%(ORGAN_NAME[organ-1], dice_organ.item())
-            #         print('%s: dice %.4f, recall %.4f, precision %.4f.'%(ORGAN_NAME[organ-1], dice_organ.item(), recall.item(), precision.item()))
-            # print(content)
+        #     # for organ in organ_list:
+        #     #     if torch.sum(label[b,organ-1,:,:,:].cuda()) != 0:
+        #     #         dice_organ, recall, precision = dice_score(pred_hard_post[b,organ-1,:,:,:].cuda(), label[b,organ-1,:,:,:].cuda())
+        #     #         dice_list[template_key][0][organ-1] += dice_organ.item()
+        #     #         dice_list[template_key][1][organ-1] += 1
+        #     #         content += '%s: %.4f, '%(ORGAN_NAME[organ-1], dice_organ.item())
+        #     #         print('%s: dice %.4f, recall %.4f, precision %.4f.'%(ORGAN_NAME[organ-1], dice_organ.item(), recall.item(), precision.item()))
+        #     # print(content)
         
 
-            ### testing phase for this function
-            one_channel_label_v1, one_channel_label_v2 = merge_label(pred_hard_post, name)
-            batch['one_channel_label_v1'] = one_channel_label_v1.cpu()
-            batch['one_channel_label_v2'] = one_channel_label_v2.cpu()
-            visualize_label(batch, save_dir + '/output/' + name[0].split('/')[0] , val_transforms)
+        #     ### testing phase for this function
+        #     one_channel_label_v1, one_channel_label_v2 = merge_label(pred_hard_post, name)
+        #     batch['one_channel_label_v1'] = one_channel_label_v1.cpu()
+        #     batch['one_channel_label_v2'] = one_channel_label_v2.cpu()
+        #     visualize_label(batch, save_dir + '/output/' + name[0].split('/')[0] , val_transforms)
         
         if DEVICE.type == 'cuda':    
             torch.cuda.empty_cache()
@@ -112,7 +113,7 @@ def validation(model, ValLoader, val_transforms, args):
 def main():
     parser = argparse.ArgumentParser()
     # ## logging
-    # parser.add_argument('--log_name', default='inference', help='The path resume from checkpoint')
+    parser.add_argument('--log_name', default='inference', help='The path resume from checkpoint')
     # ## model load
     parser.add_argument('--resume', default='./pretrained_weights/swinunetr.pth', help='The path resume from checkpoint')
     # parser.add_argument('--pretrain', default='./pretrained_weights/swin_unetr.base_5000ep_f48_lr2e-4_pretrained.pt', 
@@ -127,7 +128,7 @@ def main():
     # parser.add_argument('--dataset_list', nargs='+', default=['benchmark']) # 'PAOT', 'felix'
 
     # The path to get to the data directory
-    parser.add_argument('--data_root_path', default='/Users/ramya/universal_model_data/', help='data root path')
+    # parser.add_argument('--data_root_path', default='/Users/ramya/universal_model_data/', help='data root path')
     # The path in the CLIP embedding folder to get to the list of images to predict
     parser.add_argument('--data_txt_path', default='./dataset/dataset_list/spleen_1.nii.gz', help='data txt path')
     # parser.add_argument('--batch_size', default=1, type=int, help='batch size')
@@ -164,7 +165,7 @@ def main():
     
     #Load pre-trained weights
     store_dict = model.state_dict()
-    checkpoint = torch.load(args.resume)
+    checkpoint = torch.load(args.resume, map_location=DEVICE)
     load_dict = checkpoint['net']
     # args.epoch = checkpoint['epoch']
 
