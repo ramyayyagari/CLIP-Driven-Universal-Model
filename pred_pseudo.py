@@ -25,14 +25,14 @@ torch.multiprocessing.set_sharing_strategy('file_system')
 
 
 def validation(model, ValLoader, val_transforms, args):
-    save_dir = 'out/' + args.log_name #+ f'/pesudolbl_{args.epoch}'
+    save_dir = 'out/'
     if not os.path.isdir(save_dir):
         os.mkdir(save_dir)
         os.mkdir(save_dir+'/predict')
     model.eval()
-    dice_list = {}
-    for key in TEMPLATE.keys():
-        dice_list[key] = np.zeros((2, NUM_CLASS)) # 1st row for dice, 2nd row for count
+    # dice_list = {}
+    # for key in TEMPLATE.keys():
+    #     dice_list[key] = np.zeros((2, NUM_CLASS)) # 1st row for dice, 2nd row for count
     for index, batch in enumerate(tqdm(ValLoader)):
         # print('%d processd' % (index))
         image, name = batch["image"].to(DEVICE), batch["name"]
@@ -77,7 +77,7 @@ def validation(model, ValLoader, val_transforms, args):
         if DEVICE.type == 'cuda':    
             torch.cuda.empty_cache()
     
-    ave_organ_dice = np.zeros((2, NUM_CLASS))
+    # ave_organ_dice = np.zeros((2, NUM_CLASS))
 
     # with open('out/'+args.log_name+f'/test_{args.epoch}.txt', 'w') as f:
     #     for key in TEMPLATE.keys():
@@ -111,36 +111,27 @@ def validation(model, ValLoader, val_transforms, args):
 
 def main():
     parser = argparse.ArgumentParser()
-    ## for distributed training
-    parser.add_argument('--dist', dest='dist', type=bool, default=False,
-                        help='distributed training or not')
-    parser.add_argument("--local_rank", type=int)
-    parser.add_argument("--device")
-    parser.add_argument("--epoch", default=0)
-    ## logging
-    parser.add_argument('--log_name', default='Nvidia', help='The path resume from checkpoint')
-    ## model load
+    # ## logging
+    # parser.add_argument('--log_name', default='inference', help='The path resume from checkpoint')
+    # ## model load
     parser.add_argument('--resume', default='./pretrained_weights/swinunetr.pth', help='The path resume from checkpoint')
-    parser.add_argument('--pretrain', default='./pretrained_weights/swin_unetr.base_5000ep_f48_lr2e-4_pretrained.pt', 
-                        help='The path of pretrain model')
+    # parser.add_argument('--pretrain', default='./pretrained_weights/swin_unetr.base_5000ep_f48_lr2e-4_pretrained.pt', 
+    #                     help='The path of pretrain model')
     parser.add_argument('--backbone', default='swinunetr', help='backbone [swinunetr or unet]')
-    ## hyperparameter
-    parser.add_argument('--max_epoch', default=1000, type=int, help='Number of training epoches')
-    parser.add_argument('--store_num', default=10, type=int, help='Store model how often')
-    parser.add_argument('--lr', default=1e-4, type=float, help='Learning rate')
-    parser.add_argument('--weight_decay', default=1e-5, type=float, help='Weight Decay')
+    # ## hyperparameter
+    # parser.add_argument('--max_epoch', default=1000, type=int, help='Number of training epoches')
+    # parser.add_argument('--store_num', default=10, type=int, help='Store model how often')
+    # parser.add_argument('--lr', default=1e-4, type=float, help='Learning rate')
+    # parser.add_argument('--weight_decay', default=1e-5, type=float, help='Weight Decay')
 
-    ## dataset
-    parser.add_argument('--dataset_list', nargs='+', default=['PAOT_123457891213', 'PAOT_10_inner']) # 'PAOT', 'felix'
-    ### please check this argment carefully
-    ### PAOT: include PAOT_123457891213 and PAOT_10
-    ### PAOT_123457891213: include 1 2 3 4 5 7 8 9 12 13
-    ### PAOT_10_inner: same with NVIDIA for comparison
-    ### PAOT_10: original division
-    parser.add_argument('--data_root_path', default='/computenodes/node31/team1/jliu/data/ct_data/', help='data root path')
-    parser.add_argument('--data_txt_path', default='./dataset/dataset_list/', help='data txt path')
-    parser.add_argument('--batch_size', default=1, type=int, help='batch size')
-    parser.add_argument('--num_workers', default=8, type=int, help='workers numebr for DataLoader')
+    # parser.add_argument('--dataset_list', nargs='+', default=['benchmark']) # 'PAOT', 'felix'
+
+    # The path to get to the data directory
+    parser.add_argument('--data_root_path', default='/Users/ramya/universal_model_data/', help='data root path')
+    # The path in the CLIP embedding folder to get to the list of images to predict
+    parser.add_argument('--data_txt_path', default='./dataset/dataset_list/spleen_1.nii.gz', help='data txt path')
+    # parser.add_argument('--batch_size', default=1, type=int, help='batch size')
+    # parser.add_argument('--num_workers', default=8, type=int, help='workers number for DataLoader')
     parser.add_argument('--a_min', default=-175, type=float, help='a_min in ScaleIntensityRanged')
     parser.add_argument('--a_max', default=250, type=float, help='a_max in ScaleIntensityRanged')
     parser.add_argument('--b_min', default=0.0, type=float, help='b_min in ScaleIntensityRanged')
@@ -153,13 +144,13 @@ def main():
     parser.add_argument('--roi_z', default=96, type=int, help='roi size in z direction')
     parser.add_argument('--num_samples', default=1, type=int, help='sample number in each ct')
 
-    parser.add_argument('--phase', default='test', help='train or validation or test')
+    parser.add_argument('--phase', default='predict')
     parser.add_argument('--cache_dataset', action="store_true", default=False, help='whether use cache dataset')
-    parser.add_argument('--store_result', action="store_true", default=False, help='whether save prediction result')
+    # parser.add_argument('--store_result', action="store_true", default=True, help='whether save prediction result')
     parser.add_argument('--cache_rate', default=0.6, type=float, help='The percentage of cached data in total')
 
-    parser.add_argument('--threshold_organ', default='Pancreas Tumor')
-    parser.add_argument('--threshold', default=0.6, type=float)
+    # parser.add_argument('--threshold_organ', default='Pancreas Tumor')
+    # parser.add_argument('--threshold', default=0.6, type=float)
 
     args = parser.parse_args()
 
