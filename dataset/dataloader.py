@@ -389,10 +389,10 @@ def get_loader(args):
         pred_post_lbl = []
         pred_name = []
 
-        line = args.data_txt_path
-        name = line.strip().split()[1].split('.')[0]
-        pred_img.append(args.data_root_path + line.strip().split()[0])
-        pred_lbl.append(args.data_root_path + line.strip().split()[1])
+        line = args.data_txt_path # './dataset/dataset_list/spleen_1.nii.gz'
+        name = line.strip().split('/')[-1].split('.')[0] # spleen_1
+        pred_img.append(args.data_root_path.strip() + line.strip())
+        # pred_lbl.append(args.data_root_path + line.strip().split()[1])
         pred_post_lbl.append(args.data_root_path + name.replace('label', 'post_label') + '.h5')
         pred_name.append(name)
         data_dicts_pred = [{'image': image, 'label': label, 'post_label': post_label, 'name': name}

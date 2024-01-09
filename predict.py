@@ -48,13 +48,13 @@ def predict(model, PredLoader, val_transforms, args):
         if DEVICE.type == 'cuda':
             torch.cuda.empty_cache()
 
-        B = pred_hard.shape[0]
-        for b in range(B):
-            content = 'case%s| '%(name[b])
-            template_key = get_key(name[b])
-            organ_list = TEMPLATE[template_key]
-            pred_hard_post = organ_post_process(pred_hard.numpy(), organ_list, args.log_name+'/'+name[0].split('/')[0]+'/'+name[0].split('/')[-1],args)
-            pred_hard_post = torch.tensor(pred_hard_post)
+        # B = pred_hard.shape[0]
+        # for b in range(B):
+        #     content = 'case%s| '%(name[b])
+        #     template_key = get_key(name[b])
+        #     organ_list = TEMPLATE[template_key]
+        #     pred_hard_post = organ_post_process(pred_hard.numpy(), organ_list, args.log_name+'/'+name[0].split('/')[0]+'/'+name[0].split('/')[-1],args)
+        #     pred_hard_post = torch.tensor(pred_hard_post)
 
             # for organ in organ_list:
             #     if torch.sum(label[b,organ-1,:,:,:].to(DEVICE)) != 0:
@@ -71,15 +71,15 @@ def predict(model, PredLoader, val_transforms, args):
             np.savez_compressed(save_dir + '/predict/' + name[0].split('/')[0] + name[0].split('/')[-1], 
                             pred=pred_sigmoid_store, label=label_store)
             ### testing phase for this function
-            one_channel_label_v1, one_channel_label_v2 = merge_label(pred_hard_post, name)
-            batch['one_channel_label_v1'] = one_channel_label_v1.cpu()
-            batch['one_channel_label_v2'] = one_channel_label_v2.cpu()
+            # one_channel_label_v1, one_channel_label_v2 = merge_label(pred_hard_post, name)
+            # batch['one_channel_label_v1'] = one_channel_label_v1.cpu()
+            # batch['one_channel_label_v2'] = one_channel_label_v2.cpu()
 
-            _, split_label = merge_label(batch["post_label"], name)
-            batch['split_label'] = split_label.cpu()
+            # _, split_label = merge_label(batch["post_label"], name)
+            # batch['split_label'] = split_label.cpu()
             # print(batch['label'].shape, batch['one_channel_label'].shape)
             # print(torch.unique(batch['label']), torch.unique(batch['one_channel_label']))
-            visualize_label(batch, save_dir + '/output/' + name[0].split('/')[0] , val_transforms)
+            # visualize_label(batch, save_dir + '/output/' + name[0].split('/')[0] , val_transforms)
             ## load data
             # data = np.load('/out/epoch_80/predict/****.npz')
             # pred, label = data['pred'], data['label']
@@ -134,25 +134,26 @@ def main():
 
     # parser.add_argument('--dataset_list', nargs='+', default=['benchmark']) # 'PAOT', 'felix'
 
-    # Input for data
+    # The path to get to the data directory
     parser.add_argument('--data_root_path', default='/Users/ramya/universal_model_data/', help='data root path')
-    parser.add_argument('--data_txt_path', default='./dataset/dataset_list/benchmark_test.txt', help='data txt path')
+    # The path in the CLIP embedding folder to get to the list of images to predict
+    parser.add_argument('--data_txt_path', default='./dataset/dataset_list/spleen_1.nii.gz', help='data txt path')
     # parser.add_argument('--batch_size', default=1, type=int, help='batch size')
     # parser.add_argument('--num_workers', default=8, type=int, help='workers number for DataLoader')
-    # parser.add_argument('--a_min', default=-175, type=float, help='a_min in ScaleIntensityRanged')
-    # parser.add_argument('--a_max', default=250, type=float, help='a_max in ScaleIntensityRanged')
-    # parser.add_argument('--b_min', default=0.0, type=float, help='b_min in ScaleIntensityRanged')
-    # parser.add_argument('--b_max', default=1.0, type=float, help='b_max in ScaleIntensityRanged')
-    # parser.add_argument('--space_x', default=1.5, type=float, help='spacing in x direction')
-    # parser.add_argument('--space_y', default=1.5, type=float, help='spacing in y direction')
-    # parser.add_argument('--space_z', default=1.5, type=float, help='spacing in z direction')
-    # parser.add_argument('--roi_x', default=96, type=int, help='roi size in x direction')
-    # parser.add_argument('--roi_y', default=96, type=int, help='roi size in y direction')
-    # parser.add_argument('--roi_z', default=96, type=int, help='roi size in z direction')
-    # parser.add_argument('--num_samples', default=1, type=int, help='sample number in each ct')
+    parser.add_argument('--a_min', default=-175, type=float, help='a_min in ScaleIntensityRanged')
+    parser.add_argument('--a_max', default=250, type=float, help='a_max in ScaleIntensityRanged')
+    parser.add_argument('--b_min', default=0.0, type=float, help='b_min in ScaleIntensityRanged')
+    parser.add_argument('--b_max', default=1.0, type=float, help='b_max in ScaleIntensityRanged')
+    parser.add_argument('--space_x', default=1.5, type=float, help='spacing in x direction')
+    parser.add_argument('--space_y', default=1.5, type=float, help='spacing in y direction')
+    parser.add_argument('--space_z', default=1.5, type=float, help='spacing in z direction')
+    parser.add_argument('--roi_x', default=96, type=int, help='roi size in x direction')
+    parser.add_argument('--roi_y', default=96, type=int, help='roi size in y direction')
+    parser.add_argument('--roi_z', default=96, type=int, help='roi size in z direction')
+    parser.add_argument('--num_samples', default=1, type=int, help='sample number in each ct')
 
     parser.add_argument('--phase', default='predict')
-    # parser.add_argument('--cache_dataset', action="store_true", default=False, help='whether use cache dataset')
+    parser.add_argument('--cache_dataset', action="store_true", default=False, help='whether use cache dataset')
     # parser.add_argument('--store_result', action="store_true", default=True, help='whether save prediction result')
     parser.add_argument('--cache_rate', default=0.6, type=float, help='The percentage of cached data in total')
 
