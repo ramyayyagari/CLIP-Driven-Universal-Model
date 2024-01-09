@@ -51,9 +51,10 @@ def validation(model, ValLoader, val_transforms, args):
 
         B = pred_hard.shape[0]
         for b in range(B):
-            content = 'case%s| '%(name[b])
-            template_key = get_key(name[b])
-            organ_list = TEMPLATE[template_key]
+            # content = 'case%s| '%(name[b])
+            # template_key = get_key(name[b])
+            # organ_list = TEMPLATE[template_key]
+            organ_list = [1] # hardcoded for spleen
             pred_hard_post = organ_post_process(pred_hard.numpy(), organ_list, args.log_name+'/'+name[0].split('/')[0]+'/'+name[0].split('/')[-1],args)
             pred_hard_post = torch.tensor(pred_hard_post)
 
