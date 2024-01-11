@@ -630,14 +630,14 @@ def visualize_label(batch, save_dir, input_transform):
     ## input_transform: the dataloader transform
     post_transforms = Compose([
         Invertd(
-            keys=["label", 'one_channel_label_v1', 'one_channel_label_v2'], #, 'split_label'
+            keys=['model_out'], #, 'split_label'
             transform=input_transform,
             orig_keys="image",
             nearest_interp=True,
             to_tensor=True,
         ),
-        SaveImaged(keys="label", 
-                meta_keys="label_meta_dict" , 
+        SaveImaged(keys="model_out", 
+                meta_keys="image_meta_dict" , #we don't have a label_meta_dict
                 output_dir=save_dir, 
                 output_postfix="gt", 
                 resample=False
@@ -648,19 +648,20 @@ def visualize_label(batch, save_dir, input_transform):
         #         output_postfix="split_gt", 
         #         resample=False
         # ),
-        SaveImaged(keys='one_channel_label_v1', 
-                meta_keys="label_meta_dict" , 
-                output_dir=save_dir, 
-                output_postfix="result_v1", 
-                resample=False
-        ),
-        SaveImaged(keys='one_channel_label_v2', 
-                meta_keys="label_meta_dict" , 
-                output_dir=save_dir, 
-                output_postfix="result_v2", 
-                resample=False
-        ),
+        # SaveImaged(keys='one_channel_label_v1', 
+        #         meta_keys="label_meta_dict" , 
+        #         output_dir=save_dir, 
+        #         output_postfix="result_v1", 
+        #         resample=False
+        # ),
+        # SaveImaged(keys='one_channel_label_v2', 
+        #         meta_keys="label_meta_dict" , 
+        #         output_dir=save_dir, 
+        #         output_postfix="result_v2", 
+        #         resample=False
+        # ),
     ])
+
     
     batch = [post_transforms(i) for i in decollate_batch(batch)]
 

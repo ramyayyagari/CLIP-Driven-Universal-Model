@@ -38,7 +38,7 @@ def validation(model, ValLoader, val_transforms, args):
     for index, batch in enumerate(tqdm(ValLoader)):
         # print('%d processd' % (index))
         image, name = batch["image"].to(DEVICE), batch["name"]
-        affine_matrix = nib.load(image).affine
+        # affine_matrix = nib.load(image).affine
         print(image.shape)
         # print(label.shape)
         with torch.no_grad():
@@ -53,19 +53,18 @@ def validation(model, ValLoader, val_transforms, args):
             torch.cuda.empty_cache()
         
         np_pred = pred_hard.numpy()
-        nifti_img = nib.Nifti1Image(np_pred, affine_matrix) 
-        nib.save(nifti_img, 'pred_output.nii.gz')
+        # nifti_img = nib.Nifti1Image(np_pred, affine_matrix) 
+        # nib.save(nifti_img, 'pred_output.nii.gz')
 
         ### Commented out for now
-        # B = pred_hard.shape[0]
-        # for b in range(0):
-        #     # content = 'case%s| '%(name[b])
-        #     # template_key = get_key(name[b])
-        #     # organ_list = TEMPLATE[template_key]
-        #     organ_list = [1] # hardcoded for spleen
-        #     pred_hard_post = organ_post_process(pred_hard.numpy(), organ_list, args.log_name+'/'+name[0].split('/')[0]+'/'+name[0].split('/')[-1],args)
-        #     pred_hard_post = torch.tensor(pred_hard_post)
-
+        B = pred_hard.shape[0]
+        for b in range(B):
+            # content = 'case%s| '%(name[b])
+            # template_key = get_key(name[b])
+            # organ_list = TEMPLATE[template_key]
+            organ_list = [1] # hardcoded for spleen
+            pred_hard_post = organ_post_process(pred_hard.numpy(), organ_list, args.log_name+'/'+name[0].split('/')[0]+'/'+name[0].split('/')[-1],args)
+            pred_hard_post = torch.tensor(pred_hard_post)
         #     # for organ in organ_list:
         #     #     if torch.sum(label[b,organ-1,:,:,:].cuda()) != 0:
         #     #         dice_organ, recall, precision = dice_score(pred_hard_post[b,organ-1,:,:,:].cuda(), label[b,organ-1,:,:,:].cuda())
@@ -77,11 +76,15 @@ def validation(model, ValLoader, val_transforms, args):
         
 
         #     ### testing phase for this function
-        #     one_channel_label_v1, one_channel_label_v2 = merge_label(pred_hard_post, name)
-        #     batch['one_channel_label_v1'] = one_channel_label_v1.cpu()
-        #     batch['one_channel_label_v2'] = one_channel_label_v2.cpu()
-        #     visualize_label(batch, save_dir + '/output/' + name[0].split('/')[0] , val_transforms)
-        
+            # one_channel_label_v1, one_channel_label_v2 = merge_label(pred_hard_post, name)
+            # batch['one_channel_label_v1'] = one_channel_label_v1.cpu()
+            # batch['one_channel_label_v2'] = one_channel_label_v2.cpu()
+            
+            #note that this 0:1 is veryyy temporary... 
+            batch['model_out'] = pred_hard_post[:, 0:1, :, :, :].cpu()
+            visualize_label(batch, save_dir + '/output/', val_transforms)
+            
+
         if DEVICE.type == 'cuda':    
             torch.cuda.empty_cache()
     
