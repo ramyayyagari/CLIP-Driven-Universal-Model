@@ -56,7 +56,8 @@ TEMPLATE={
     '10_08': [15, 29], # post process
     '10_09': [1],
     '10_10': [31],
-    '15': [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17] ## total segmentation
+    '15': [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17], ## total segmentation
+    'all': [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32],
 }
 
 ORGAN_NAME = ['Spleen', 'Right Kidney', 'Left Kidney', 'Gall Bladder', 'Esophagus', 
@@ -480,8 +481,6 @@ def anomly_detection(pred_mask, post_pred_mask, save_path, batch, anomly_num):
                 total_anomly_slice_number+=1
         
         if len(real_anomly_slice)!=0:
-
-            
             plot_anomalies(lung_df,save_dir=save_path)
             print('anomaly detection plot created')
             for s in real_anomly_slice:
@@ -770,6 +769,17 @@ def check_data(dataset_check):
     plt.title("label")
     plt.imshow(label[0, :, :, 150].detach().cpu())
     plt.show()
+
+def string_to_organ_list(organ_string: str):
+  user_organs = organ_string.split(',')
+  for i in range(len(user_organs)):
+    if user_organs[i] in ORGAN_NAME:
+        user_organs[i] = ORGAN_NAME.index(user_organs[i])
+    else:
+        raise Exception(f'{user_organs[i]} not a valid organ name')
+  return user_organs
+
+
 
 if __name__ == "__main__":
     threshold_organ(torch.zeros(1,12,1))    

@@ -20,6 +20,7 @@ from utils import loss
 from utils.utils import dice_score, threshold_organ, visualize_label, merge_label, get_key
 from utils.utils import TEMPLATE, ORGAN_NAME, NUM_CLASS, DEVICE
 from utils.utils import organ_post_process, threshold_organ
+from utils.utils import string_to_organ_list
 
 import nibabel as nib
 
@@ -62,7 +63,7 @@ def validation(model, ValLoader, val_transforms, args):
             # content = 'case%s| '%(name[b])
             # template_key = get_key(name[b])
             # organ_list = TEMPLATE[template_key]
-            organ_list = [1] # hardcoded for spleen
+            organ_list = string_to_organ_list(args.organs)
             pred_hard_post = organ_post_process(pred_hard.numpy(), organ_list, args.log_name+'/'+name[0].split('/')[0]+'/'+name[0].split('/')[-1],args)
             pred_hard_post = torch.tensor(pred_hard_post)
         #     # for organ in organ_list:
@@ -154,7 +155,7 @@ def main():
     parser.add_argument('--roi_y', default=96, type=int, help='roi size in y direction')
     parser.add_argument('--roi_z', default=96, type=int, help='roi size in z direction')
     parser.add_argument('--num_samples', default=1, type=int, help='sample number in each ct')
-
+    parser.add_argument('--organs', default='NONE', help='organs to segment')
     parser.add_argument('--phase', default='predict')
     parser.add_argument('--cache_dataset', action="store_true", default=False, help='whether use cache dataset')
     # parser.add_argument('--store_result', action="store_true", default=True, help='whether save prediction result')
@@ -196,6 +197,8 @@ def main():
 
     test_loader, val_transforms = get_loader_without_gt(args)
 
+    if args.organs == 'NONE':
+      raise Exception('please input valid names of organs')
     validation(model, test_loader, val_transforms, args)
 
 if __name__ == "__main__":
