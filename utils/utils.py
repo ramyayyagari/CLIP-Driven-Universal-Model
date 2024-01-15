@@ -112,6 +112,42 @@ MERGE_MAPPING_v2 = {
     '15': [(1,1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7), (8,8), (9,9), (10,10), (11,11), (12,12), (13,13), (14,14), (16,16), (17,17), (18,18)],
 }
 
+PSEUDO_LABEL_ALL = {
+    'all':[(1,1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7), (8,8), (9,9), (10,10), (11,11), (12,12), (13,13), (14,14), (15,15),(16,16), (17,17), (18,18),(19,19),(20,20),(21,21),(22,22),(23,23),(24,24),(25,25),(26,26),(27,27),(28,28),(29,29),(30,30),(31,31),(32,32)],
+    'Spleen':[(1,1)],
+    'Right Kidney': [(2,1)],
+    'Left Kidney': [(3,1)],
+    'Gall Bladder':[(4,1)],
+    'Esophagus':[(5,1)],
+    'Liver':[(6,1)],
+    'Stomach':[(7,1)],
+    'Arota':[(8,1)],
+    'Postcava':[(9,1)],
+    'Portal Vein and Splenic Vein':[(10,1)],
+    'Pancreas':[(11,1)],
+    'Right Adrenal Gland':[(12,1)],
+    'Left Adrenal Gland':[(13,1)],
+    'Duodenum':[(14,1)],
+    'Hepatic Vessel':[(15,1)],
+    'Right Lung':[(16,1)],
+    'Left Lung':[(17,1)],
+    'Colon':[(18,1)],
+    'Intestine':[(19,1)],
+    'Rectum': [(20,1)], 
+    'Bladder': [(21,1)], 
+    'Prostate': [(22,1)], 
+    'Left Head of Femur': [(23,1)], 
+    'Right Head of Femur': [(24,1)], 
+    'Celiac Truck': [(25,1)],
+    'Kidney Tumor': [(26,1)], 
+    'Liver Tumor': [(27,1)], 
+    'Pancreas Tumor': [(28,1)], 
+    'Hepatic Vessel Tumor': [(29,1)], 
+    'Lung Tumor': [(30,1)], 
+    'Colon Tumor': [(31,1)], 
+    'Kidney Cyst': [(32,1)]
+}
+
 THRESHOLD_DIC = {
     'Spleen': 0.5,
     'Right Kidney': 0.5,
@@ -685,6 +721,11 @@ def merge_label(pred_bmask, name):
         # predicted_prob = pred_sigmoid[b][organ_index]
     return merged_label_v1, merged_label_v2
 
+def merge_label_JOY(pred_bmask):
+  B, C, W, H, D = pred_bmask.shape
+  merged_label = torch.zeros(B, 1, W, H, D).to(DEVICE)
+  for b in range(B):
+    transfer_mapping = PSEUDO_LABEL_ALL['all']
 
 def get_key(name):
     ## input: name
