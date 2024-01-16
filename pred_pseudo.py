@@ -20,7 +20,7 @@ from utils import loss
 from utils.utils import dice_score, threshold_organ, visualize_label, merge_label, get_key
 from utils.utils import TEMPLATE, ORGAN_NAME, NUM_CLASS, DEVICE
 from utils.utils import organ_post_process, threshold_organ
-from utils.utils import string_to_organ_list
+from utils.utils import string_to_organ_list, merge_label_organs
 
 import nibabel as nib
 
@@ -82,7 +82,9 @@ def validation(model, ValLoader, val_transforms, args):
             # batch['one_channel_label_v2'] = one_channel_label_v2.cpu()
             
             #note that this 0:1 is veryyy temporary... 
-            batch['model_out'] = pred_hard_post[:, 0:1, :, :, :].cpu()
+            # batch['model_out'] = pred_hard_post[:, 0:1, :, :, :].cpu()
+            model_out_tensor = merge_label_organs(pred_hard_post, organ_list)
+            batch['model_out'] = model_out_tensor.cpu()
             visualize_label(batch, save_dir + '/output/', val_transforms)
             
 

@@ -674,7 +674,7 @@ def visualize_label(batch, save_dir, input_transform):
         SaveImaged(keys="model_out", 
                 meta_keys="image_meta_dict" , #we don't have a label_meta_dict
                 output_dir=save_dir, 
-                output_postfix="gt", 
+                output_postfix="prediction", 
                 resample=False
         ),
         # SaveImaged(keys='split_label', 
@@ -721,11 +721,17 @@ def merge_label(pred_bmask, name):
         # predicted_prob = pred_sigmoid[b][organ_index]
     return merged_label_v1, merged_label_v2
 
-def merge_label_JOY(pred_bmask):
+def merge_label_organs(pred_bmask, organ_list):
   B, C, W, H, D = pred_bmask.shape
   merged_label = torch.zeros(B, 1, W, H, D).to(DEVICE)
   for b in range(B):
     transfer_mapping = PSEUDO_LABEL_ALL['all']
+    for item in transfer_mapping:
+      src, tgt = item
+      if src in organ_list:
+        merged_label[b][0][pred_bmask[b][src-1]==1] = tgt
+  return merged_label
+
 
 def get_key(name):
     ## input: name
@@ -812,10 +818,12 @@ def check_data(dataset_check):
     plt.show()
 
 def string_to_organ_list(organ_string: str):
+  if organ_string == 'ALL':
+    return list(range(1, 33))
   user_organs = organ_string.split(',')
   for i in range(len(user_organs)):
     if user_organs[i] in ORGAN_NAME:
-        user_organs[i] = ORGAN_NAME.index(user_organs[i])
+        user_organs[i] = ORGAN_NAME.index(user_organs[i]) + 1
     else:
         raise Exception(f'{user_organs[i]} not a valid organ name')
   return user_organs
