@@ -85,7 +85,7 @@ def validation(model, ValLoader, val_transforms, args):
             # batch['model_out'] = pred_hard_post[:, 0:1, :, :, :].cpu()
             model_out_tensor = merge_label_organs(pred_hard_post, organ_list)
             batch['model_out'] = model_out_tensor.cpu()
-            visualize_label(batch, save_dir + '/output/', val_transforms)
+            visualize_label(batch, save_dir + '/predict/', val_transforms)
             
 
         if DEVICE.type == 'cuda':    

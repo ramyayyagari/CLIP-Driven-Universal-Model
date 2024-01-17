@@ -675,7 +675,8 @@ def visualize_label(batch, save_dir, input_transform):
                 meta_keys="image_meta_dict" , #we don't have a label_meta_dict
                 output_dir=save_dir, 
                 output_postfix="prediction", 
-                resample=False
+                resample=False,
+                separate_folder=False,
         ),
         # SaveImaged(keys='split_label', 
         #         meta_keys="label_meta_dict" , 
